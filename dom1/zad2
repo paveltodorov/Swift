@@ -1,0 +1,22 @@
+print("Hello World! :-)");
+
+var arr:[[String]] = [["^","0","0","0","0","0","0","1"],
+                      ["0","1","1","1","1","1","0","0"],
+                      ["0","0","0","0","0","1","1","1"],
+                      ["0","1","1","1","0","1","0","0"],
+                      ["0","1","0","1","0","0","0","1"],
+                      ["0","0","0","1","0","1","0","*"]]
+print(arr[0].count)
+func findPathBetween(start:(i:Int,j:Int),end:(i:Int,j:Int),in arr:[[String]]) -> Bool
+{
+    if start == end {return true}
+    if start.i < 0 || start.j < 0 {return false}
+    //if start.i > arr.count || start.j < arr.count[0] {return false}
+    return 
+     findPathBetween(start:(i:start.i+1,j:start.j) ,end:end,in:arr) ||
+     findPathBetween(start:(i:start.i-1,j:start.j) ,end:end,in:arr) ||
+     findPathBetween(start:(i:start.i ,j:start.j+1) ,end:end,in:arr) ||
+     findPathBetween(start:(i:start.i ,j:start.j-1) ,end:end,in:arr);
+    //return true;
+}
+//print( findPathBetween(start:(0,0),end:(7,7),in:arr))  
