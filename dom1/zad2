@@ -7,6 +7,19 @@ var arr:[[String]] = [["^","0","0","0","0","0","0","1"],
                       ["0","1","0","1","0","0","0","1"],
                       ["0","0","0","1","0","1","0","*"]]
 print(arr[0].count)
+
+func findChar(in arr:[[String]],char:String)->(Int,Int)
+{
+    for i in 0..<arr.count
+    {
+      for j in 0..<arr[0].count
+    {
+     if arr[i][j] == char {return (i,j) }    
+    }
+    }
+    return (-1,-1)
+}
+print(findChar(in: arr,char:"*"))
 func findPathBetween(start:(i:Int,j:Int),end:(i:Int,j:Int),in arr:[[String]]) -> Bool
 {
     if start == end {return true}
@@ -19,4 +32,4 @@ func findPathBetween(start:(i:Int,j:Int),end:(i:Int,j:Int),in arr:[[String]]) ->
      findPathBetween(start:(i:start.i ,j:start.j-1) ,end:end,in:arr);
     //return true;
 }
-//print( findPathBetween(start:(0,0),end:(7,7),in:arr))  
+//print( findPathBetween(start:(0,0),end:(7,7),in:arr))   
