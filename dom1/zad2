@@ -14,15 +14,17 @@ func evaluate(expression : String) -> Int
      {numbers.append(num)}
      num = 0;
      b = false
-     while (operations.isEmpty ||
+     while !(operations.isEmpty ||
            priority(operations[operations.endIndex]) <= priority(ch))
            
           {
+              print(numbers)
               var a = numbers.remove(at:numbers.count - 1)
-              /*var b = numbers.remove(at:numbers.count - 1)
-             var op = operations.remove(at: operations.index(before: operations.endIndex))
+              var b = numbers.remove(at:numbers.count - 1)
+              var op = operations.remove(at: operations.index(before: operations.endIndex))
               var result = execute(a:a,b:b,op:op)
-              numbers.append(result)*/
+              numbers.append(result)
+              
           } 
      operations.insert(ch, at: operations.endIndex)      
     }
@@ -39,7 +41,7 @@ func evaluate(expression : String) -> Int
   }
   if b
   {numbers.append(num)}
-  return 5
+  return numbers.remove(at:numbers.count - 1)
 }
 func isOperator(str:Character) -> Bool
 {
@@ -65,4 +67,4 @@ func execute(a:Int,b:Int,op:Character) -> Int
     }
 }
 
-evaluate(expression :"1 5 0") 
+print(evaluate(expression :"15 + 10  "))  
