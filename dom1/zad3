@@ -1,4 +1,5 @@
-print("Hello World! :-)");
+var dx:[Int] = [0,1,0,-1]
+var dy:[Int] = [1,0,-1,0]
 
 var arr:[[String]] = [["^","0","0","0","0","0","0","1"],
                       ["0","1","1","1","1","1","0","0"],
@@ -20,16 +21,21 @@ func findChar(in arr:[[String]],char:String)->(Int,Int)
     return (-1,-1)
 }
 print(findChar(in: arr,char:"*"))
-func findPathBetween(start:(i:Int,j:Int),end:(i:Int,j:Int),in arr:[[String]]) -> Bool
+func findPathBetween(start:(i:Int,j:Int),end:(i:Int,j:Int),in arr:inout[[String]]) -> Bool
 {
+    print(start)
     if start == end {return true}
     if start.i < 0 || start.j < 0 {return false}
-    //if start.i > arr.count || start.j < arr.count[0] {return false}
-    return 
-     findPathBetween(start:(i:start.i+1,j:start.j) ,end:end,in:arr) ||
-     findPathBetween(start:(i:start.i-1,j:start.j) ,end:end,in:arr) ||
-     findPathBetween(start:(i:start.i ,j:start.j+1) ,end:end,in:arr) ||
-     findPathBetween(start:(i:start.i ,j:start.j-1) ,end:end,in:arr);
-    //return true;
+    if start.i >= arr.count || start.j >= arr[0].count {return false}
+    if arr[start.i][start.j] == "1" {return false}
+    
+    for k in 0..<3
+     {
+        arr[start.i][start.j] == "1"
+        var b:Bool = findPathBetween(start:(i:start.i + dx[k] ,j:start.j + dy[k]) ,end:end,in:&arr)  
+        arr[start.i][start.j] == "0"
+        if b == true {return true}
+     }
+    return false 
 }
-//print( findPathBetween(start:(0,0),end:(7,7),in:arr))   
+print( findPathBetween(start:(0,0),end:(2,6),in:&arr))
