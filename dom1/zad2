@@ -14,7 +14,10 @@ func evaluate(expression : String) -> Int
      {numbers.append(num)}
      num = 0;
      b = false
-     operations.insert(ch, at: operations.endIndex) 
+     while operations.isEmpty ||
+           priority(operations[operations.endIndex]) < priority(ch)
+          {} 
+     operations.insert(ch, at: operations.endIndex)      
     }
     else
     {
@@ -36,12 +39,23 @@ func isOperator(str:Character) -> Bool
     return str == "*" || str == "/" || str=="-" || str == "+"
                       || str == "^" || str=="(" || str == ")"
 }
-func priority(str:Character) -> Int 
+func priority(_ str:Character) -> Int 
 {
  if str == "^"               {return 2}
  if str == "*" || str == "/" {return 1}
  if str == "+" || str == "-" {return 0}
  return -1
 }
+func execute(a:Int,b:Int,op:String) -> Int
+{
+    switch op
+    {
+    case "+" : return a + b
+    case "-" : return a - b
+    case "*" : return a * b
+    case "/" : return a / b
+    default  : return 0
+    }
+}
 
-evaluate(expression :"(823*7) - (1045 + 65) + 8 + 123") 
+evaluate(expression :"(823*7) - (1045 + 65) + 8 + 123")  
