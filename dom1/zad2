@@ -3,21 +3,45 @@ func evaluate(expression : String) -> Int
   var str:String = expression
   var numbers:[Int] = []
   var operations:String = ""
+  var num:Int = 0
+  var b = false
   for i in 0..<str.characters.count
-  {
+  { 
    var ch = str[str.index(str.startIndex, offsetBy: i)]
    if isOperator(str:ch)
     {
-     operations.insert(ch, at: str.endIndex)        
+     if b 
+     {numbers.append(num)}
+     num = 0;
+     b = false
+     operations.insert(ch, at: operations.endIndex) 
     }
+    else
+    {
+     if Int(String(ch)) != nil
+       {
+         num = num*10 + Int(String(ch))! 
+         b = true
+       }
+    }
+    //print(operations)
+    //print(numbers)
   }
-  
- return 5
+  if b
+  {numbers.append(num)}
+  return 5
 }
-func isOperator(str) -> Bool
+func isOperator(str:Character) -> Bool
 {
     return str == "*" || str == "/" || str=="-" || str == "+"
                       || str == "^" || str=="(" || str == ")"
 }
+func priority(str:Character) -> Int 
+{
+ if str == "^"               {return 2}
+ if str == "*" || str == "/" {return 1}
+ if str == "+" || str == "-" {return 0}
+ return -1
+}
 
-evaluate(expression :"fbgdfb") 
+evaluate(expression :"(823*7) - (1045 + 65) + 8 + 123") 
