@@ -14,9 +14,16 @@ func evaluate(expression : String) -> Int
      {numbers.append(num)}
      num = 0;
      b = false
-     while operations.isEmpty ||
-           priority(operations[operations.endIndex]) < priority(ch)
-          {} 
+     while (operations.isEmpty ||
+           priority(operations[operations.endIndex]) <= priority(ch))
+           
+          {
+              var a = numbers.remove(at:numbers.count - 1)
+              /*var b = numbers.remove(at:numbers.count - 1)
+             var op = operations.remove(at: operations.index(before: operations.endIndex))
+              var result = execute(a:a,b:b,op:op)
+              numbers.append(result)*/
+          } 
      operations.insert(ch, at: operations.endIndex)      
     }
     else
@@ -46,7 +53,7 @@ func priority(_ str:Character) -> Int
  if str == "+" || str == "-" {return 0}
  return -1
 }
-func execute(a:Int,b:Int,op:String) -> Int
+func execute(a:Int,b:Int,op:Character) -> Int
 {
     switch op
     {
@@ -58,4 +65,4 @@ func execute(a:Int,b:Int,op:String) -> Int
     }
 }
 
-evaluate(expression :"(823*7) - (1045 + 65) + 8 + 123")  
+evaluate(expression :"1 5 0") 
