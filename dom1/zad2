@@ -1,0 +1,23 @@
+func evaluate(expression : String) -> Int
+{
+  var str:String = expression
+  var numbers:[Int] = []
+  var operations:String = ""
+  for i in 0..<str.characters.count
+  {
+   var ch = str[str.index(str.startIndex, offsetBy: i)]
+   if isOperator(str:ch)
+    {
+     operations.insert(ch, at: str.endIndex)        
+    }
+  }
+  
+ return 5
+}
+func isOperator(str) -> Bool
+{
+    return str == "*" || str == "/" || str=="-" || str == "+"
+                      || str == "^" || str=="(" || str == ")"
+}
+
+evaluate(expression :"fbgdfb") 
