@@ -11,22 +11,41 @@ func evaluate(expression : String) -> Int
    if isOperator(str:ch)
     {
      if b 
-     {numbers.append(num)}
+     {
+     numbers.append(num)
      num = 0;
      b = false
-     while !(operations.isEmpty ||
-           priority(operations[operations.endIndex]) <= priority(ch))
-           
+     }
+     if(ch == ")")
+     {
+       var op:Character 
+       repeat
+       {
+              op = operations.remove(at: operations.index(before: operations.endIndex))
+              if(op == "(") {break}
+              var a = numbers.remove(at:numbers.count - 1)
+              var b = numbers.remove(at:numbers.count - 1)
+              var result = execute(a:a,b:b,op:op)
+              numbers.append(result)
+        }
+        while !(op == "(" )
+     }
+     else
+     {
+     while 
+          !(operations.isEmpty 
+          || priority(operations[operations.index(before: operations.endIndex)]) < priority(ch)
+          || (ch == "^" && operations[operations.index(before: operations.endIndex)] == "^")
+          || ch == "(")
           {
-              print(numbers)
               var a = numbers.remove(at:numbers.count - 1)
               var b = numbers.remove(at:numbers.count - 1)
               var op = operations.remove(at: operations.index(before: operations.endIndex))
               var result = execute(a:a,b:b,op:op)
               numbers.append(result)
-              
           } 
      operations.insert(ch, at: operations.endIndex)      
+    }
     }
     else
     {
@@ -41,6 +60,14 @@ func evaluate(expression : String) -> Int
   }
   if b
   {numbers.append(num)}
+  while(!(operations.isEmpty ))
+  {
+       var a = numbers.remove(at:numbers.count - 1)
+       var b = numbers.remove(at:numbers.count - 1)
+       var op = operations.remove(at: operations.index(before: operations.endIndex))
+       var result = execute(a:a,b:b,op:op)
+       numbers.append(result)  
+  }
   return numbers.remove(at:numbers.count - 1)
 }
 func isOperator(str:Character) -> Bool
@@ -60,11 +87,12 @@ func execute(a:Int,b:Int,op:Character) -> Int
     switch op
     {
     case "+" : return a + b
-    case "-" : return a - b
+    case "-" : return b - a
     case "*" : return a * b
-    case "/" : return a / b
+    case "/" : return b / a
+    case "^" : return Int(pow(Double(b) ,Double(a)))
     default  : return 0
     }
 }
 
-print(evaluate(expression :"15 + 10  "))  
+print(evaluate(expression :"15 -  (5 + 8)")) 
