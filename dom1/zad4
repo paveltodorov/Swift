@@ -14,11 +14,9 @@ class ReplaceExpression : Expression
         super.init(str:str)
         self.values = values
     }
-    
-}
-func evaluate(expression : String,values:[String:Int])-> Int
+func evaluate()-> Int
 {
-  var str:String = expression
+  //var str:String = expression
   var numbers:[Int] = []
   var operations:String = ""
   var num:Int = 0
@@ -61,10 +59,12 @@ func evaluate(expression : String,values:[String:Int])-> Int
     }
     else
     {
-     numbers.append(values[(String(ch))]!)
+     if ch != " "
+     {
+       numbers.append(values[(String(ch))]!)
+     }
     }
-  }
- 
+  } 
   while(!(operations.isEmpty ))
   {
        var a = numbers.remove(at:numbers.count - 1)
@@ -74,6 +74,7 @@ func evaluate(expression : String,values:[String:Int])-> Int
        numbers.append(result)  
   }
   return numbers.remove(at:numbers.count - 1)
+}
 }
 func isOperator(str:Character) -> Bool
 {
@@ -99,6 +100,10 @@ func execute(a:Int,b:Int,op:Character) -> Int
     default  : return 0
     }
 }
-var str = "( a + b + c)*d"
-var values = ["a":5,"b":6,"c":10,"d":2]
-var res = evaluate(expression:str,values:values)
+var str = "(a*d - (b + c - a^d) )*d"
+var values  = ["a":5,"b":6,"c":10,"d":2]
+var values1 = ["a":3,"b":-2,"c":9,"d":3]
+var obj = ReplaceExpression(str:str,values:values)
+print(obj.evaluate())
+var obj1 = ReplaceExpression(str:str,values:values1)
+print(obj1.evaluate())
