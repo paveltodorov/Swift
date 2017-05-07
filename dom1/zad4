@@ -1,0 +1,104 @@
+class Expression 
+{
+    var str:String = ""
+    init(str:String)
+    {
+        self.str = str
+    }
+}
+class ReplaceExpression : Expression
+{
+    var values:[String:Int] = [:]
+    init(str:String,values:[String:Int])
+    {
+        super.init(str:str)
+        self.values = values
+    }
+    
+}
+func evaluate(expression : String,values:[String:Int])-> Int
+{
+  var str:String = expression
+  var numbers:[Int] = []
+  var operations:String = ""
+  var num:Int = 0
+  var b = false
+  for i in 0..<str.characters.count
+  { 
+   var ch = str[str.index(str.startIndex, offsetBy: i)]
+   if isOperator(str:ch)
+    {
+     if(ch == ")")
+     {
+       var op:Character 
+       repeat
+       {
+              op = operations.remove(at: operations.index(before: operations.endIndex))
+              if(op == "(") {break}
+              var a = numbers.remove(at:numbers.count - 1)
+              var b = numbers.remove(at:numbers.count - 1)
+              var result = execute(a:a,b:b,op:op)
+              numbers.append(result)
+        }
+        while !(op == "(" )
+     }
+     else
+     {
+     while 
+          !(operations.isEmpty 
+          || priority(operations[operations.index(before: operations.endIndex)]) < priority(ch)
+          || (ch == "^" && operations[operations.index(before: operations.endIndex)] == "^")
+          || ch == "(")
+          {
+              var a = numbers.remove(at:numbers.count - 1)
+              var b = numbers.remove(at:numbers.count - 1)
+              var op = operations.remove(at: operations.index(before: operations.endIndex))
+              var result = execute(a:a,b:b,op:op)
+              numbers.append(result)
+          } 
+     operations.insert(ch, at: operations.endIndex)      
+    }
+    }
+    else
+    {
+     numbers.append(values[(String(ch))]!)
+    }
+  }
+ 
+  while(!(operations.isEmpty ))
+  {
+       var a = numbers.remove(at:numbers.count - 1)
+       var b = numbers.remove(at:numbers.count - 1)
+       var op = operations.remove(at: operations.index(before: operations.endIndex))
+       var result = execute(a:a,b:b,op:op)
+       numbers.append(result)  
+  }
+  return numbers.remove(at:numbers.count - 1)
+}
+func isOperator(str:Character) -> Bool
+{
+    return str == "*" || str == "/" || str=="-" || str == "+"
+                      || str == "^" || str=="(" || str == ")"
+}
+func priority(_ str:Character) -> Int 
+{
+ if str == "^"               {return 2}
+ if str == "*" || str == "/" {return 1}
+ if str == "+" || str == "-" {return 0}
+ return -1
+}
+func execute(a:Int,b:Int,op:Character) -> Int
+{
+    switch op
+    {
+    case "+" : return a + b
+    case "-" : return b - a
+    case "*" : return a * b
+    case "/" : return b / a
+    case "^" : return Int(pow(Double(b) ,Double(a)))
+    default  : return 0
+    }
+}
+var str = "( a + b + c)*d"
+var values = ["a":5,"b":6,"c":10,"d":2]
+var res = evaluate(expression:str,values:values)
