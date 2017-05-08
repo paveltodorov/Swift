@@ -28,17 +28,15 @@ func evaluate()-> Int
     {
      if(ch == ")")
      {
-       var op:Character 
-       repeat
+       var op:Character = operations.remove(at: operations.index(before: operations.endIndex))
+        while !(op == "(" )
        {
-              op = operations.remove(at: operations.index(before: operations.endIndex))
-              if(op == "(") {break}
               var a = numbers.remove(at:numbers.count - 1)
               var b = numbers.remove(at:numbers.count - 1)
               var result = execute(a:a,b:b,op:op)
               numbers.append(result)
+              op = operations.remove(at: operations.index(before: operations.endIndex))
         }
-        while !(op == "(" )
      }
      else
      {
@@ -64,7 +62,8 @@ func evaluate()-> Int
        numbers.append(values[(String(ch))]!)
      }
     }
-  } 
+  }
+ 
   while(!(operations.isEmpty ))
   {
        var a = numbers.remove(at:numbers.count - 1)
@@ -100,9 +99,9 @@ func execute(a:Int,b:Int,op:Character) -> Int
     default  : return 0
     }
 }
-var str = "(a*d - (b + c - a^d) )*d"
-var values  = ["a":5,"b":6,"c":10,"d":2]
-var values1 = ["a":3,"b":-2,"c":9,"d":3]
+var str = "(a*d - (b - c + a^d) )*d + e^d^d  "
+var values  = ["a":5,"b":6,"c":10,"d":2,"e" : 4]
+var values1 = ["a":3,"b":-2,"c":9,"d":3,"e" : 4]
 var obj = ReplaceExpression(str:str,values:values)
 print(obj.evaluate())
 var obj1 = ReplaceExpression(str:str,values:values1)
