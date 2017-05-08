@@ -19,16 +19,15 @@ func evaluate(expression : String) -> Int
      if(ch == ")")
      {
        var op:Character 
-       repeat
+       op = operations.remove(at: operations.index(before: operations.endIndex))
+       while !(op == "(" )
        {
-              op = operations.remove(at: operations.index(before: operations.endIndex))
-              if(op == "(") {break}
               var a = numbers.remove(at:numbers.count - 1)
               var b = numbers.remove(at:numbers.count - 1)
               var result = execute(a:a,b:b,op:op)
               numbers.append(result)
+              op = operations.remove(at: operations.index(before: operations.endIndex))
         }
-        while !(op == "(" )
      }
      else
      {
@@ -55,8 +54,6 @@ func evaluate(expression : String) -> Int
          b = true
        }
     }
-    //print(operations)
-    //print(numbers)
   }
   if b
   {numbers.append(num)}
@@ -94,5 +91,4 @@ func execute(a:Int,b:Int,op:Character) -> Int
     default  : return 0
     }
 }
-
-print(evaluate(expression :"15 -  (5 + 8)")) 
+print(evaluate(expression :"2 + 2*((8 - 5) - 3^2)*8 + 2^3^2 ")) 
