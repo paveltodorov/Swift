@@ -16,7 +16,6 @@ class ReplaceExpression : Expression
     }
 func evaluate()-> Int
 {
-  //var str:String = expression
   var numbers:[Int] = []
   var operations:String = ""
   var num:Int = 0
