@@ -47,7 +47,7 @@ func evaluate(expression : String) -> Int
     }
     else
     {
-     if Int(String(ch)) != nil
+     if ch != " "
        {
          num = num*10 + Int(String(ch))! 
          b = true
