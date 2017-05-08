@@ -1,13 +1,12 @@
 func evaluate(expression : String) -> Int
 {
-  var str:String = expression
   var numbers:[Int] = []
   var operations:String = ""
   var num:Int = 0
   var b = false
-  for i in 0..<str.characters.count
+  for i in 0..<expression.characters.count
   { 
-   var ch = str[str.index(str.startIndex, offsetBy: i)]
+   var ch = expression[expression.index(expression.startIndex, offsetBy: i)]
    if isOperator(str:ch)
     {
      if b 
