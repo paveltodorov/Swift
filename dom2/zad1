@@ -1,4 +1,4 @@
-class Attribute
+struct Attribute
 {
     var name:String
     var type:String
@@ -8,7 +8,7 @@ class Attribute
         self.type = type
     }
 }
-class Function
+struct Function
 {
     var name:String
     var body:String
@@ -23,20 +23,21 @@ class Function
     }
 }
 
-class ClassAndExpansion
+struct ClassAndExpansion
 {   
     var isClass:Bool = true
     var name:String = ""
     var inherits:[String] = []
     var funcArr:[Function] = []
     var attributes:[Attribute] = []
-    init(isClass:Bool,name:String,
-         inherits:[String],funcArr:[Function])
+    init(name:String,isClass:Bool = true,
+         inherits:[String] = [],attributes:[Attribute] = [],funcArr:[Function] = [])
     {
       self.isClass = isClass 
       self.name = name
       self.inherits = inherits
       self.funcArr = funcArr
+      self.attributes = attributes
     }
 }
 func contains(_ arr:[Character],_ ch:Character)->Bool
@@ -50,7 +51,7 @@ func contains(_ arr:[Character],_ ch:Character)->Bool
     }
     return false
 }
-func skipSymbol(file:String,i:Int,till:[Character])->(String,Int,Character)
+func skipSymbol(file:String,i:Int,till:[Character])->(str:String,i:Int,ch:Character)
 {
     var str:String = ""
     var j:Int = 0
@@ -61,7 +62,35 @@ func skipSymbol(file:String,i:Int,till:[Character])->(String,Int,Character)
                        str.insert(ch, at: str.endIndex)
                        j+=1
                    }
-    while (!contains(till,ch))
+    while (i + j < file.characters.count && !contains(till,ch))
+    if i + j  == file.characters.count
+    {return ("/",-1,"1") }
     ch=str.remove(at: str.index(before: str.endIndex))
-    return (str,i + j,ch)   
+    return (str,i + j,ch)
+    
 }
+func parse(file:String)->[ClassAndExpansion]
+{
+    var data:[ClassAndExpansion] = []
+    var i = 0
+    var tuple:(str:String,i:Int,ch:Character)
+    var ch:Character = "d"
+    tuple = skipSymbol(file:file,i:i,till:["$","+"])
+      i = tuple.i
+   while (tuple.i != -1) 
+  {
+      //var tuple1 = skipSymbol(file:file,i:i,till:[" "])
+      //i = tuple1.i
+               var name:String = "";
+               var tuple2 = skipSymbol(file:file,i:i,till:[" ",":","-","+"])
+               //i = tuple2.i
+               var functions:[Function] = []
+               var attributes:[Attribute] = []
+     data.append(ClassAndExpansion(name:tuple2.str))
+     tuple = skipSymbol(file:file,i:i,till:["$","+"])
+      i = tuple.i
+    }
+    
+  return data
+}
+print(parse(file:"+fvdfdf:hjh +dsvsdv " ))
