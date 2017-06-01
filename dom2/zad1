@@ -1,16 +1,3 @@
-
-class Function
-{
-    var name:String
-    var body:String
-    var type:String
-    init(name:String = "",body:String="",type:String = "")
-    {
-        self.name = name
-        self.body = body
-        self.type = type
-    }
-}
 class Attribute
 {
     var name:String
@@ -21,6 +8,21 @@ class Attribute
         self.type = type
     }
 }
+class Function
+{
+    var name:String
+    var body:String
+    var type:String
+    var parameters:[Attribute]=[]
+    init(name:String = "",type:String = "",body:String="",parameters:[Attribute] = [])
+    {
+        self.name = name
+        self.body = body
+        self.type = type
+        self.parameters = parameters
+    }
+}
+
 class ClassAndExpansion
 {   
     var isClass:Bool = true
@@ -37,4 +39,29 @@ class ClassAndExpansion
       self.funcArr = funcArr
     }
 }
-var data:[ClassAndExpansion] = []
+func contains(_ arr:[Character],_ ch:Character)->Bool
+{
+    for i:Character in arr
+    {
+        if i == ch
+        {
+            return true
+        }
+    }
+    return false
+}
+func skipSymbol(file:String,i:Int,till:[Character])->(String,Int,Character)
+{
+    var str:String = ""
+    var j:Int = 0
+    var ch:Character = " "
+    repeat
+                   {
+                       ch = file[file.index(file.startIndex, offsetBy: i + j)]
+                       str.insert(ch, at: str.endIndex)
+                       j+=1
+                   }
+    while (!contains(till,ch))
+    ch=str.remove(at: str.index(before: str.endIndex))
+    return (str,i + j,ch)   
+}
