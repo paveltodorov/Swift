@@ -37,3 +37,4 @@ class ClassAndExpansion
       self.funcArr = funcArr
     }
 }
+var data:[ClassAndExpansion] = []
