@@ -30,7 +30,7 @@ struct ClassAndExpansion
     var inherits:[String] = []
     var funcArr:[Function] = []
     var attributes:[Attribute] = []
-    init(name:String,isClass:Bool = true,
+    init(name:String="",isClass:Bool = true,
          inherits:[String] = [],attributes:[Attribute] = [],funcArr:[Function] = [])
     {
       self.isClass = isClass 
@@ -39,6 +39,19 @@ struct ClassAndExpansion
       self.funcArr = funcArr
       self.attributes = attributes
     }
+}
+func isFunction(str:String)->Bool
+{
+	var j:Int = 0
+	var ch:Character
+	while (j < str.characters.count)
+	{
+     ch = str[str.index(str.startIndex, offsetBy: j)]
+	 if ch == "("
+	 {return true}
+	j += 1
+	}
+	return false
 }
 func contains(_ arr:[Character],_ ch:Character)->Bool
 {
@@ -51,46 +64,69 @@ func contains(_ arr:[Character],_ ch:Character)->Bool
     }
     return false
 }
-func skipSymbol(file:String,i:Int,till:[Character])->(str:String,i:Int,ch:Character)
+func skipSymbol(file:String,i:inout Int,till:[Character])->(str:String,ch:Character)
 {
     var str:String = ""
-    var j:Int = 0
     var ch:Character = " "
     repeat
                    {
-                       ch = file[file.index(file.startIndex, offsetBy: i + j)]
+                       ch = file[file.index(file.startIndex, offsetBy: i)]
                        str.insert(ch, at: str.endIndex)
-                       j+=1
+                       i += 1
                    }
-    while (i + j < file.characters.count && !contains(till,ch))
-    if i + j  == file.characters.count
-    {return ("/",-1,"1") }
+    while (i < file.characters.count && !contains(till,ch))
+    if i == file.characters.count
+    {
+		i = -50
+		//return (str,"1") 
+	}
     ch=str.remove(at: str.index(before: str.endIndex))
-    return (str,i + j,ch)
-    
+    return (str,ch) 
+}
+func skipWhite(file:String,i:inout Int) -> Void
+{
+	var ch:Character
+	repeat
+                   {
+                       ch = file[file.index(file.startIndex, offsetBy: i)]
+                       i += 1
+                   }
+    while (i < file.characters.count && ch == " ")
+	i -= 1
 }
 func parse(file:String)->[ClassAndExpansion]
 {
     var data:[ClassAndExpansion] = []
     var i = 0
-    var tuple:(str:String,i:Int,ch:Character)
-    var ch:Character = "d"
-    tuple = skipSymbol(file:file,i:i,till:["$","+"])
-      i = tuple.i
-   while (tuple.i != -1) 
-  {
-      //var tuple1 = skipSymbol(file:file,i:i,till:[" "])
-      //i = tuple1.i
-               var name:String = "";
-               var tuple2 = skipSymbol(file:file,i:i,till:[" ",":","-","+"])
-               //i = tuple2.i
-               var functions:[Function] = []
-               var attributes:[Attribute] = []
-     data.append(ClassAndExpansion(name:tuple2.str))
-     tuple = skipSymbol(file:file,i:i,till:["$","+"])
-      i = tuple.i
-    }
-    
+	var tuple:(str:String,ch:Character) 
+	while(i >= 0)
+	{
+	  var c:ClassAndExpansion = ClassAndExpansion()	
+	  tuple = skipSymbol(file:file,i:&i,till:["$","+"])
+		if i < 0
+		{
+			break
+		}
+	  if tuple.ch == "$"
+		{
+		c.isClass = true	
+		}
+      else
+		{
+		c.isClass = false	
+		}
+	  skipWhite(file:file,i:&i)
+	  var tuple2:(str:String,ch:Character) = skipSymbol(file:file,i:&i,till:[" ",":"])
+	  c.name = tuple2.str
+	 
+	  
+	  data.append(c)	
+	}   
   return data
 }
-print(parse(file:"+fvdfdf:hjh +dsvsdv " ))
+//print()
+var i = 0
+//print(skipSymbol(file:"    go to",i:&i,till:["j"]))
+//print(i)
+var file:String = "+ prot1 +prot2 $class1"
+print(parse(file:file))
