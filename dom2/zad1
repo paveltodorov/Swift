@@ -107,11 +107,11 @@ func readProperties(file:String,i:inout Int,c:inout ClassAndExpansion) -> Void
        {
         ch = file[file.index(file.startIndex, offsetBy: i)]
 	    i += 1
-		skipWhite(file:file,i:&i)
-		tuple = skipSymbol(file:file,i:&i,till:[" "])
-	    skipSymbol(file:file,i:&i,till:[":",">"])
-		skipWhite(file:file,i:&i)   
-		tuple1 = skipSymbol(file:file,i:&i,till:[" "])
+		skipWhite(file:file,i:&i)                            
+		tuple = skipSymbol(file:file,i:&i,till:[" "])        
+	    skipSymbol(file:file,i:&i,till:[":",">"])            
+		skipWhite(file:file,i:&i)                            
+		tuple1 = skipSymbol(file:file,i:&i,till:[" "])       ;if i < 0 {break}
 	    if ch == "-"
 		{
 		c.attributes.append(Attribute(name:tuple.str,type:tuple1.str))		
@@ -120,25 +120,24 @@ func readProperties(file:String,i:inout Int,c:inout ClassAndExpansion) -> Void
 		{
 		c.funcArr.append(Function(name:tuple.str,type:tuple1.str))	
 		}
-		tuple2 = skipSymbol(file:file,i:&i,till:[":","-","$","+"])
-		i -= 1   
+		tuple2 = skipSymbol(file:file,i:&i,till:[":","-","$","+"]) ;if i < 0 {break}
+		//print(tuple2)
+		   
         }
     while (i < file.characters.count && i >= 0 && tuple2.ch != "$" && tuple2.ch != "+"  )
-	//i -= 1
+	i-=1
 }
 func parse(file:String)->[ClassAndExpansion]
 {
     var data:[ClassAndExpansion] = []
     var i = 0
-	var tuple:(str:String,ch:Character) 
+	var tuple:(str:String,ch:Character)
+	tuple = skipSymbol(file:file,i:&i,till:["$","+"])
+	
 	while(i >= 0)
 	{
 	  var c:ClassAndExpansion = ClassAndExpansion()	
-	  tuple = skipSymbol(file:file,i:&i,till:["$","+"])
-		if i < 0
-		{
-			break
-		}
+		tuple.ch = "$"
 	  if tuple.ch == "$"
 		{
 		c.isClass = true	
@@ -147,23 +146,18 @@ func parse(file:String)->[ClassAndExpansion]
 		{
 		c.isClass = false	
 		}
-	  skipWhite(file:file,i:&i)
+	  skipWhite(file:file,i:&i) 
+		if i < 0 {break}
 	  tuple  = skipSymbol(file:file,i:&i,till:[" "])
 	  c.name = tuple.str
-	  /*if tuple.ch == " "
-	  {skipWhite(file:file,i:&i)} 
-	  if i < 0   {break }
-	  tuple = skipSymbol(file:file,i:&i,till:[":","-","+","$"])
-	  if tuple.ch == ":" 
-		{
-		  	
-		}
-	  else if tuple.ch == "-"
-		{
-			
-		}*/
-		
-	  
+	  tuple = skipSymbol(file:file,i:&i,till:["$","+","-",":"])	
+	  i -= 1	
+	  if tuple.ch == "-" || tuple.ch == ":"	
+	  {readProperties(file:file,i:&i,c:&c)}
+	  if i < 0 {break}	
+      print("----")	
+	  print(c)	
+	  print("----")	
 	  data.append(c)	
 	}   
   return data
@@ -172,10 +166,12 @@ func parse(file:String)->[ClassAndExpansion]
 var i = 0
 //print(skipSymbol(file:"    go to",i:&i,till:["j"]))
 //print(i)
-var file:String = "+ prot1 :abv +prot2:gdff $ class1  : ffeff"
-//print(parse(file:file))
-var j = 0
-var file1 = "- att1 : Int - degree : String :go -> Int  + "
+var file:String = "+ prot1 - abv : Int : func1 -> Int  : func2 -> String                                +class1 : func3 -> Int1     "
+print(parse(file:file))
+/*var j = 0
+var file1 = "- att1 : Int - degree : String :go -> Int   "
 var c:ClassAndExpansion = ClassAndExpansion()
 readProperties(file:file1,i:&j,c:&c)
 print(c)
+*/
+
