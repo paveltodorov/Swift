@@ -62,18 +62,23 @@ struct ClassAndExpansion
 	{
 	if isClass 
 	 {
-	print("class \(name)")	
+	print("class \(name)",terminator: " ")	
 	 }
 	else {
-		 print("protocol \(name)")
+		 print("extention \(name)",terminator: " ")
 	     }
 	if inherits != []
 		{
-			print(":")
-			for i in inherits
+			print(": ",terminator: "")
+			for i in 0..<inherits.count - 1
 			{
-			 print()
+			 print(inherits[i],terminator: ", ")
 			}
+			print(inherits[inherits.count - 1])
+		}
+	else
+		{
+			print(" ")
 		}
 	print(" {")	
      for i in attributes
@@ -245,16 +250,12 @@ func parse(file:String)->[ClassAndExpansion]
 //print(skipSymbol(file:"    go to",i:&i,till:["j"]))+
 //print(i)
 let file:String = 
-"+ prot1 : de  $ prot2 : de , em : ggg() ->  Int + prot3 - ddd :  Int : fff() -> Double  "//, swert + h"                                                                     /* - abv : Int                                                                           : func1 -> Int                                                                         : func2 -> String                                                                      $ class1   "*/
+" $ Time                                                                                 - hour : Int                                                                           - minutes : Int                                                                         - seconds :  Double                                                                     : getHour -> Int                                                                       $ Appointment : Time                                                                   : getDay() -> String                                                                   - day : String                                                                         : isImpotrant() -> Bool                                                                 + Printable : Time  , Hour                                                             : print() -> Void    "
 var data = parse(file:file)
 for cl in data
 {
 	cl.convert()
 }
-/*var j = 0
-var file1 = "- att1 : Int - degree : String :go -> Int   "
-var c:ClassAndExpansion = ClassAndExpansion()
-readProperties(file:file1,i:&j,c:&c)
-print(c)
-*/
+
+
 
