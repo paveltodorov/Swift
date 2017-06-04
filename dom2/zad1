@@ -7,6 +7,10 @@ struct Attribute
         self.name = name
         self.type = type
     }
+	func convert() -> Void
+	{
+    print("var \(name) : \(type)")		
+	}
 }
 struct Function
 {
@@ -21,6 +25,21 @@ struct Function
         self.type = type
         self.parameters = parameters
     }
+	func convert() -> Void
+	{
+    print("func \(name) -> \(type)")
+	print("  {")
+	switch(type)
+	 {
+     case "Int" : print("  return 0")
+	 case "Double" : print("  return 0")
+	 case "Bool" : print("  return 0")
+     case "String" : print("  return 0 ")
+	 default :	  print("  return ")
+	 }
+	print("  }")	
+	}
+	
 }
 
 struct ClassAndExpansion
@@ -38,6 +57,35 @@ struct ClassAndExpansion
       self.inherits = inherits
       self.funcArr = funcArr
       self.attributes = attributes
+    }
+	func convert() -> Void
+	{
+	if isClass 
+	 {
+	print("class \(name)")	
+	 }
+	else {
+		 print("protocol \(name)")
+	     }
+	if inherits != []
+		{
+			print(":")
+			for i in inherits
+			{
+			 print()
+			}
+		}
+	print(" {")	
+     for i in attributes
+		{
+		 i.convert()	
+		}
+	for i in funcArr
+		{
+		 i.convert()	
+		}	
+    print(" }")
+	print(" ")	
     }
 }
 func isFunction(str:String)->Bool
@@ -121,11 +169,11 @@ func readProperties(file:String,i:inout Int,c:inout ClassAndExpansion) -> Void
 		c.funcArr.append(Function(name:tuple.str,type:tuple1.str))	
 		}
 		tuple2 = skipSymbol(file:file,i:&i,till:[":","-","$","+"]) ;if i < 0 {break}
-		//print(tuple2)
+		i-=1
 		   
         }
     while (i < file.characters.count && i >= 0 && tuple2.ch != "$" && tuple2.ch != "+"  )
-	i-=1
+	
 }
 func parse(file:String)->[ClassAndExpansion]
 {
@@ -133,12 +181,15 @@ func parse(file:String)->[ClassAndExpansion]
     var i = 0
 	var tuple:(str:String,ch:Character)
 	tuple = skipSymbol(file:file,i:&i,till:["$","+"])
-	
+	i -= 1
 	while(i >= 0)
 	{
-	  var c:ClassAndExpansion = ClassAndExpansion()	
-		tuple.ch = "$"
-	  if tuple.ch == "$"
+	  var c:ClassAndExpansion = ClassAndExpansion()
+	  var ch = file[file.index(file.startIndex, offsetBy: i)]	
+	  i += 1
+	  //print("ch = \(ch)")	
+		//tuple.ch = "$"
+	  if ch == "$"
 		{
 		c.isClass = true	
 		}
@@ -149,25 +200,57 @@ func parse(file:String)->[ClassAndExpansion]
 	  skipWhite(file:file,i:&i) 
 		if i < 0 {break}
 	  tuple  = skipSymbol(file:file,i:&i,till:[" "])
+	  //print("name = \(tuple.str)")	
 	  c.name = tuple.str
 	  tuple = skipSymbol(file:file,i:&i,till:["$","+","-",":"])	
 	  i -= 1	
-	  if tuple.ch == "-" || tuple.ch == ":"	
-	  {readProperties(file:file,i:&i,c:&c)}
-	  if i < 0 {break}	
-      print("----")	
-	  print(c)	
-	  print("----")	
-	  data.append(c)	
-	}   
+	  if tuple.ch == "-" 	
+	  {readProperties(file:file,i:&i,c:&c)}	
+	  else if tuple.ch == ":"
+	  { 
+	    var icopy:Int = i + 1
+		skipWhite(file:file,i:&icopy)  
+		var tuple2 = skipSymbol(file:file,i:&icopy,till:[" ",","])  
+		if !isFunction(str:tuple2.str)
+		{
+			while(true)
+			{   
+			c.inherits.append(tuple2.str)    
+			icopy -= 1
+		    tuple2 = skipSymbol(file:file,i:&icopy,till:[",","-",":","$","+"])
+			if tuple2.ch != "," || icopy < 0
+			{break}							
+			skipWhite(file:file,i:&icopy)
+			tuple2 = skipSymbol(file:file,i:&icopy,till:[" ",","])					
+		    }
+	      i = icopy	- 1// - 1
+			if tuple2.ch == ":" || tuple2.ch == "-"
+		    {readProperties(file:file,i:&i,c:&c)}	
+	    }
+	   else	
+		  {
+		  readProperties(file:file,i:&i,c:&c)	  
+		  }
+	  }
+      //print("----")	
+	  //print(c)	
+	  //print("----")	
+	  data.append(c)
+	  if i<0 {break}
+	  } 
   return data
 }
 //print()
-var i = 0
-//print(skipSymbol(file:"    go to",i:&i,till:["j"]))
+//var i = 0
+//print(skipSymbol(file:"    go to",i:&i,till:["j"]))+
 //print(i)
-var file:String = "+ prot1 - abv : Int : func1 -> Int  : func2 -> String                                +class1 : func3 -> Int1     "
-print(parse(file:file))
+let file:String = 
+"+ prot1 : de  $ prot2 : de , em : ggg() ->  Int + prot3 - ddd :  Int : fff() -> Double  "//, swert + h"                                                                     /* - abv : Int                                                                           : func1 -> Int                                                                         : func2 -> String                                                                      $ class1   "*/
+var data = parse(file:file)
+for cl in data
+{
+	cl.convert()
+}
 /*var j = 0
 var file1 = "- att1 : Int - degree : String :go -> Int   "
 var c:ClassAndExpansion = ClassAndExpansion()
