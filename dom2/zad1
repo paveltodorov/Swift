@@ -2,14 +2,23 @@ struct Attribute
 {
     var name:String
     var type:String
+	var defaultValue:String
     init(name:String = "",type:String = "")
     {
         self.name = name
         self.type = type
+		switch(type)
+	 {
+     case "Int" : defaultValue = "0"
+	 case "Double" : defaultValue = "0"
+	 case "Bool" : defaultValue = "false"
+	 default :	  defaultValue = ""
+	 }
+		
     }
 	func convert() -> Void
 	{
-    print("var \(name) : \(type)")		
+    print("var \(name) : \(type) = \(defaultValue)")		
 	}
 }
 struct Function
@@ -92,22 +101,25 @@ struct ClassAndExpansion
 	print("init(",terminator: " ")
 	if attributes.count == 1
 	 {
-	 print("\(attributes[0].name) : \(attributes[0].type) ",terminator : "  ") 	 
+	 print("\(attributes[0].name) : \(attributes[0].type) = \(attributes[0].defaultValue)",terminator : "  ") 	 
 	 }
 	else if attributes.count > 1
 	{	
 	for i in 0 ..< attributes.count - 1
 	{
-	print("\(attributes[i].name) : \(attributes[i].type) ",terminator : " , ")	
+	print("\(attributes[i].name) : \(attributes[i].type) = \(attributes[i].defaultValue)",terminator : " , ")	
 	}
-	print("\(attributes[attributes.count - 1].name) : \(attributes[attributes.count - 1].type) ",terminator : "  ")	
+	print("\(attributes[attributes.count - 1].name) : \(attributes[attributes.count - 1].type) = \(attributes[attributes.count - 1].defaultValue) ",terminator :" ")
 	}	
 	print(")")
 	print("  {")
 	for i in attributes
 	{
 		print("   self.\(i.name) = \(i.name)")
-	}	
+	}
+	if inherits != []
+	{print("   super.init()")}
+		
     print("  }")		
     print(" }")
 	print(" ")	
@@ -267,7 +279,7 @@ func parse(file:String)->[ClassAndExpansion]
 //print(skipSymbol(file:"    go to",i:&i,till:["j"]))+
 //print(i)
 let file:String = 
-" $ Time   - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int    $ Appointment : Time     : getDay() -> String   - day : Int   : isImpotrant() -> Bool     + Printable : Time  , Hour : print() -> Void    "
+" $ Time   - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int    $ Appointment : Time     : getDay() -> Int   - day : Int   : isImpotrant() -> Bool     + Printable : Time  , Hour : print() -> Void    "
 var data = parse(file:file)
 for cl in data
 {
