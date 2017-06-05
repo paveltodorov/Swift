@@ -43,12 +43,14 @@ struct Function
      case "Int" : print("  return 0")
 	 case "Double" : print("  return 0")
 	 case "Bool" : print("  return false")
-     case "String" : print("  return ")
 	 default :	  print("  return ")
 	 }
 	print("  }")	
 	}
-	
+	func shortConvert() -> Void
+	{
+    print("func \(name) -> \(type)")
+	}
 }
 
 struct ClassAndExpansion
@@ -67,6 +69,34 @@ struct ClassAndExpansion
       self.funcArr = funcArr
       self.attributes = attributes
     }
+	func addInit()-> Void
+	{
+	print("init(",terminator: " ")
+	if attributes.count == 1
+	 {
+	 print("\(attributes[0].name) : \(attributes[0].type) = \(attributes[0].defaultValue)",terminator : "  ") 	 
+	 }
+	else if attributes.count > 1
+	{	
+	for i in 0 ..< attributes.count - 1
+	{
+	print("\(attributes[i].name) : \(attributes[i].type) = \(attributes[i].defaultValue)",terminator : " , ")	
+	}
+	print("\(attributes[attributes.count - 1].name) : \(attributes[attributes.count - 1].type) = \(attributes[attributes.count - 1].defaultValue) ",terminator :" ")
+	}	
+	print(")")
+	if( isClass == true)	
+	{
+	print("  {")
+	for i in attributes
+	{
+		print("   self.\(i.name) = \(i.name)")
+	}
+	if inherits != []
+	{print("   super.init()")}	
+    print("  }")
+	}	
+	}
 	func convert() -> Void
 	{
 	if isClass 
@@ -74,7 +104,7 @@ struct ClassAndExpansion
 	print("class \(name)",terminator: " ")	
 	 }
 	else {
-		 print("extention \(name)",terminator: " ")
+		 print("protocol \(name)",terminator: " ")
 	     }
 	if inherits != []
 		{
@@ -94,33 +124,20 @@ struct ClassAndExpansion
 		{
 		 i.convert()	
 		}
-	for i in funcArr
+	if self.isClass		
+	 {
+		for i in funcArr
 		{
 		 i.convert()	
 		}
-	print("init(",terminator: " ")
-	if attributes.count == 1
-	 {
-	 print("\(attributes[0].name) : \(attributes[0].type) = \(attributes[0].defaultValue)",terminator : "  ") 	 
 	 }
-	else if attributes.count > 1
-	{	
-	for i in 0 ..< attributes.count - 1
-	{
-	print("\(attributes[i].name) : \(attributes[i].type) = \(attributes[i].defaultValue)",terminator : " , ")	
+	else{
+		for i in funcArr
+		{
+		 i.shortConvert()	
+		}
 	}
-	print("\(attributes[attributes.count - 1].name) : \(attributes[attributes.count - 1].type) = \(attributes[attributes.count - 1].defaultValue) ",terminator :" ")
-	}	
-	print(")")
-	print("  {")
-	for i in attributes
-	{
-		print("   self.\(i.name) = \(i.name)")
-	}
-	if inherits != []
-	{print("   super.init()")}
-		
-    print("  }")		
+	addInit()
     print(" }")
 	print(" ")	
     }
@@ -279,7 +296,7 @@ func parse(file:String)->[ClassAndExpansion]
 //print(skipSymbol(file:"    go to",i:&i,till:["j"]))+
 //print(i)
 let file:String = 
-" $ Time   - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int    $ Appointment : Time     : getDay() -> Int   - day : Int   : isImpotrant() -> Bool     + Printable : Time  , Hour : print() -> Void    "
+" $ Time   - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int    $ Appointment : Time     : getDay() -> Int   - day : Int   : isImpotrant() -> Bool     + Printable  : print() -> Void    "
 var data = parse(file:file)
 for cl in data
 {
