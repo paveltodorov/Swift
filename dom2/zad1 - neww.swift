@@ -1,4 +1,3 @@
-//func isProtocol(name:String)->Bool
 func containsAttribute(attribute:Attribute,arr:[Attribute]) -> Bool
 {
 	for i in arr
@@ -8,8 +7,7 @@ func containsAttribute(attribute:Attribute,arr:[Attribute]) -> Bool
 			return true
 		}
 	}
-	return false
-	
+	return false	
 }
 func containsFunction(function:Function,arr:[Function]) -> Bool
 {
@@ -22,7 +20,6 @@ func containsFunction(function:Function,arr:[Function]) -> Bool
 	}
 	return false	
 }
-
 struct Attribute
 {
     var name:String
@@ -195,23 +192,26 @@ class ClassData:ClassAndExpansion
       self.name = name
       self.inherits = inherits
 	  self.funcArr = funcArr
-    self.attributes = attributes
-	 print("inherits   \(self.inherits)")	
-	  for i in inherits
+      self.attributes = attributes	
+    }
+	func addProtocolFunc() -> Void
+	{
+	for i in inherits
 		{
 			var prot = isProtocol(name: i)
 			if prot != nil
 			{
+				
 				for j in prot!.attributes
 				{
-				 if  !containsAttribute(attribute:j,arr: prot!.attributes)
+				 if  !containsAttribute(attribute:j,arr: self.attributes)
 				  {
 					  self.attributes.append(j)
 				  }
 				}
 				for j in prot!.funcArr
 				{
-				 if  !containsFunction(function:j,arr: prot!.funcArr)
+				 if  !containsFunction(function:j,arr: self.funcArr)
 				  {
 					  self.funcArr.append(j)
 				  }
@@ -221,9 +221,8 @@ class ClassData:ClassAndExpansion
 			{
 				inheritsClass = true
 			}
-		}	
-		//print("inherits   \(self.inherits)")
-    }
+		}
+	}	
 	func addInit()-> Void
 	{
 	print("init(",terminator: " ")
@@ -251,6 +250,7 @@ class ClassData:ClassAndExpansion
 	}	
 	override func convert() -> Void
 	{
+	addProtocolFunc()	
     print("class \(name)",terminator: " ")	
 	if inherits != []
 		{
@@ -273,7 +273,7 @@ class ClassData:ClassAndExpansion
 		for i in funcArr
 		{
 		 i.convert()	
-		}
+		}	
 	addInit()
     print(" }")
 	print(" ")	
@@ -405,7 +405,7 @@ func parse(file:String)->([(ClassData)],[(ProtocolData)])
   return (data,data1)
 }
 let file:String = 
-" $ Time : Printable  - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int    $ Appointment : Time     : getDay() -> String   - day : Int   : isImpotrant() -> Bool     + Printable  : print() -> Void - protocolVar : Int   "
+"$ Day $ Time : , Day, Printable    - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int  : print() -> Void  $ Appointment : Time     : getDay() -> String   - day : Int   : isImpotrant() -> Bool     + Printable  : print() -> Void  : print2() -> Void - protocolVar : Int   "
  (data,data1) = parse(file:file)
 for cl in data1
 {
@@ -415,4 +415,3 @@ for cl in data
 {
 	(cl).convert()
 }
-//print(isProtocol(name:"Printable"))
