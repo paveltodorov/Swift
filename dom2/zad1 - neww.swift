@@ -100,7 +100,6 @@ func isClass(name:String)->Bool
 }
 class ClassAndExpansion
 {
-    var isClass:Bool = true
     var name:String = ""
     var inherits:[String] = []
     var funcArr:[Function] = []
