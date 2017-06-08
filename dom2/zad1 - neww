@@ -1,3 +1,28 @@
+//func isProtocol(name:String)->Bool
+func containsAttribute(attribute:Attribute,arr:[Attribute]) -> Bool
+{
+	for i in arr
+	{
+		if attribute.name == i.name
+		{
+			return true
+		}
+	}
+	return false
+	
+}
+func containsFunction(function:Function,arr:[Function]) -> Bool
+{
+	for i in arr
+	{
+		if function.name == i.name
+		{
+			return true
+		}
+	}
+	return false	
+}
+
 struct Attribute
 {
     var name:String
@@ -12,6 +37,7 @@ struct Attribute
      case "Int" : defaultValue = "0"
 	 case "Double" : defaultValue = "0"
 	 case "Bool" : defaultValue = "false"
+	 case "String" : defaultValue = "\"not implemented\""	 
 	 default :	  defaultValue = ""
 	 }
 		
@@ -19,6 +45,10 @@ struct Attribute
 	func convert() -> Void
 	{
     print("var \(name) : \(type) = \(defaultValue)")		
+	}
+	func protocolConvert() -> Void
+	{
+    print("var \(name) : \(type)  { set get }")		
 	}
 }
 struct Function
@@ -43,6 +73,7 @@ struct Function
      case "Int" : print("  return 0")
 	 case "Double" : print("  return 0")
 	 case "Bool" : print("  return false")
+     case "String" : print("  return \"not implemented\"")		 
 	 default :	  print("  return ")
 	 }
 	print("  }")	
@@ -52,9 +83,27 @@ struct Function
     print("func \(name) -> \(type)")
 	}
 }
+func isProtocol(name:String)-> ProtocolData?
+{
+	for i in data1
+	{
+		if i.name == name
+		 {return i }
+	}
+	return nil
+}
+func isClass(name:String)->Bool
+{
+	for i in data
+	{
+		if i.name == name
+		 {return true }
+	}
+	return false
+}
 class ClassAndExpansion
 {
- var isClass:Bool = true
+    var isClass:Bool = true
     var name:String = ""
     var inherits:[String] = []
     var funcArr:[Function] = []
@@ -69,16 +118,111 @@ class ClassAndExpansion
       self.funcArr = funcArr
       self.attributes = attributes
     }
+	func readProperties(file:String,i:inout Int) -> Void
+{
+	var ch:Character
+	//var ch1:Character
+	var tuple:(str:String,ch:Character)
+	var tuple1:(str:String,ch:Character)
+	var tuple2:(str:String,ch:Character)
+	repeat
+       {
+        ch = file[file.index(file.startIndex, offsetBy: i)]
+	    i += 1
+		skipWhite(file:file,i:&i)                            
+		tuple = skipSymbol(file:file,i:&i,till:[" "])        
+	    skipSymbol(file:file,i:&i,till:[":",">"])            
+		skipWhite(file:file,i:&i)                            
+		tuple1 = skipSymbol(file:file,i:&i,till:[" "])       ;if i < 0 {break}
+	    if ch == "-"
+		{
+		self.attributes.append(Attribute(name:tuple.str,type:tuple1.str))		
+		}
+		else
+		{
+		self.funcArr.append(Function(name:tuple.str,type:tuple1.str))	
+		}
+		tuple2 = skipSymbol(file:file,i:&i,till:[":","-","$","+"]) ;if i < 0 {break}
+		i-=1
+		   
+        }
+    while (i < file.characters.count && i >= 0 && tuple2.ch != "$" && tuple2.ch != "+"  )	
+}
+	func readData(file:String,i:inout Int,tuple: inout(str:String,ch:Character) ) -> Void
+     {
+     skipWhite(file:file,i:&i) 
+		if i < 0 {return}
+	  tuple  = skipSymbol(file:file,i:&i,till:[" "])	
+	  self.name = tuple.str
+	  tuple = skipSymbol(file:file,i:&i,till:["$","+","-",":"])	
+	  i -= 1	
+	  if tuple.ch == "-" 	
+	  {self.readProperties(file:file,i:&i)}	
+	  else if tuple.ch == ":"
+	  { 
+	    var icopy:Int = i + 1
+		skipWhite(file:file,i:&icopy)  
+		var tuple2 = skipSymbol(file:file,i:&icopy,till:[" ",","])  
+		if !isFunction(str:tuple2.str)
+		{
+			while(true)
+			{   
+			self.inherits.append(tuple2.str)    
+			icopy -= 1
+		    tuple2 = skipSymbol(file:file,i:&icopy,till:[",","-",":","$","+"])
+			if tuple2.ch != "," || icopy < 0
+			{break}							
+			skipWhite(file:file,i:&icopy)
+			tuple2 = skipSymbol(file:file,i:&icopy,till:[" ",","])					
+		    }
+	      i = icopy	- 1// - 1
+			if tuple2.ch == ":" || tuple2.ch == "-"
+		    {self.readProperties(file:file,i:&i)}	
+	    }
+	   else	
+		  {
+		  self.readProperties(file:file,i:&i)	  
+		  }
+	  }
+	 }
 }
 class ClassData:ClassAndExpansion
 {   
-      override init(name:String="", inherits:[String] = [],attributes:[Attribute] = [],funcArr:[Function] = [])
+	  var inheritsClass:Bool = false
+      override init(name:String="", inherits:[String] = [],attributes: [Attribute] = [],funcArr:[Function] = [])
     {
 	  super.init()	
       self.name = name
-      self.inherits = inherits	
-      self.funcArr = funcArr
-      self.attributes = attributes
+      self.inherits = inherits
+	  self.funcArr = funcArr
+    self.attributes = attributes
+	 print("inherits   \(self.inherits)")	
+	  for i in inherits
+		{
+			var prot = isProtocol(name: i)
+			if prot != nil
+			{
+				for j in prot!.attributes
+				{
+				 if  !containsAttribute(attribute:j,arr: prot!.attributes)
+				  {
+					  self.attributes.append(j)
+				  }
+				}
+				for j in prot!.funcArr
+				{
+				 if  !containsFunction(function:j,arr: prot!.funcArr)
+				  {
+					  self.funcArr.append(j)
+				  }
+				}
+			}
+			else
+			{
+				inheritsClass = true
+			}
+		}	
+		//print("inherits   \(self.inherits)")
     }
 	func addInit()-> Void
 	{
@@ -101,7 +245,7 @@ class ClassData:ClassAndExpansion
 	{
 		print("   self.\(i.name) = \(i.name)")
 	}
-	if inherits != []
+	if inheritsClass == true
 	{print("   super.init()")}	
     print("  }")
 	}	
@@ -145,24 +289,6 @@ class ProtocolData : ClassAndExpansion
       self.funcArr = funcArr
       self.attributes = attributes
     }
-	func addInit()-> Void
-	{
-	print("init(",terminator: " ")
-	if attributes.count == 1
-	 {
-	 print("\(attributes[0].name) : \(attributes[0].type) ",terminator : "  ") 	 
-	 }
-	else if attributes.count > 1
-	{	
-	for i in 0 ..< attributes.count - 1
-	{
-	print("\(attributes[i].name) : \(attributes[i].type)  ",terminator : " , ")	
-	}
-	print("\(attributes[attributes.count - 1].name) : \(attributes[attributes.count - 1].type) ) ",terminator :" ")
-	}	
-	print(")")	
-    print("  }")	
-	}
 	override func convert() -> Void
 	{
 		 print("protocol \(name)",terminator: " ")
@@ -182,17 +308,17 @@ class ProtocolData : ClassAndExpansion
 	print(" {")	
      for i in attributes
 		{
-		 i.convert()	
+		 i.protocolConvert() 	
 		}
 		for i in funcArr
 		{
 		 i.shortConvert()	
 		}	
-	addInit()
     print(" }")
 	print(" ")	
     }
 }
+
 func isFunction(str:String)->Bool
 {
 	var j:Int = 0
@@ -238,8 +364,6 @@ func skipSymbol(file:String,i:inout Int,till:[Character])->(str:String,ch:Charac
 }
 func skipWhite(file:String,i:inout Int) -> Void
 {
-	//if i>=0 && file[file.index(file.startIndex, offsetBy: i - 1)]
-	
 	var ch:Character
 	repeat
                    {
@@ -249,188 +373,46 @@ func skipWhite(file:String,i:inout Int) -> Void
     while (i < file.characters.count && ch == " ")
 	i -= 1
 }
-func readProperties(file:String,i:inout Int,c:inout ClassData) -> Void
-{
-	var ch:Character
-	//var ch1:Character
-	var tuple:(str:String,ch:Character)
-	var tuple1:(str:String,ch:Character)
-	var tuple2:(str:String,ch:Character)
-	repeat
-       {
-        ch = file[file.index(file.startIndex, offsetBy: i)]
-	    i += 1
-		skipWhite(file:file,i:&i)                            
-		tuple = skipSymbol(file:file,i:&i,till:[" "])        
-	    skipSymbol(file:file,i:&i,till:[":",">"])            
-		skipWhite(file:file,i:&i)                            
-		tuple1 = skipSymbol(file:file,i:&i,till:[" "])       ;if i < 0 {break}
-	    if ch == "-"
-		{
-		c.attributes.append(Attribute(name:tuple.str,type:tuple1.str))		
-		}
-		else
-		{
-		c.funcArr.append(Function(name:tuple.str,type:tuple1.str))	
-		}
-		tuple2 = skipSymbol(file:file,i:&i,till:[":","-","$","+"]) ;if i < 0 {break}
-		i-=1
-		   
-        }
-    while (i < file.characters.count && i >= 0 && tuple2.ch != "$" && tuple2.ch != "+"  )	
-}
-func readProperties1(file:String,i:inout Int,c:inout ProtocolData) -> Void
-{
-	var ch:Character
-	//var ch1:Character
-	var tuple:(str:String,ch:Character)
-	var tuple1:(str:String,ch:Character)
-	var tuple2:(str:String,ch:Character)
-	repeat
-       {
-        ch = file[file.index(file.startIndex, offsetBy: i)]
-	    i += 1
-		skipWhite(file:file,i:&i)                            
-		tuple = skipSymbol(file:file,i:&i,till:[" "])        
-	    skipSymbol(file:file,i:&i,till:[":",">"])            
-		skipWhite(file:file,i:&i)                            
-		tuple1 = skipSymbol(file:file,i:&i,till:[" "])       ;if i < 0 {break}
-	    if ch == "-"
-		{
-		c.attributes.append(Attribute(name:tuple.str,type:tuple1.str))		
-		}
-		else
-		{
-		c.funcArr.append(Function(name:tuple.str,type:tuple1.str))	
-		}
-		tuple2 = skipSymbol(file:file,i:&i,till:[":","-","$","+"]) ;if i < 0 {break}
-		i-=1
-		   
-        }
-    while (i < file.characters.count && i >= 0 && tuple2.ch != "$" && tuple2.ch != "+"  )	
-}
-func readData(file:String,i:inout Int,tuple: inout(str:String,ch:Character) ,c:inout ClassData ) -> Void
-     {
-     skipWhite(file:file,i:&i) 
-		if i < 0 {return}
-	  tuple  = skipSymbol(file:file,i:&i,till:[" "])	
-	  c.name = tuple.str
-	  tuple = skipSymbol(file:file,i:&i,till:["$","+","-",":"])	
-	  i -= 1	
-	  if tuple.ch == "-" 	
-	  {readProperties(file:file,i:&i,c:&c)}	
-	  else if tuple.ch == ":"
-	  { 
-	    var icopy:Int = i + 1
-		skipWhite(file:file,i:&icopy)  
-		var tuple2 = skipSymbol(file:file,i:&icopy,till:[" ",","])  
-		if !isFunction(str:tuple2.str)
-		{
-			while(true)
-			{   
-			c.inherits.append(tuple2.str)    
-			icopy -= 1
-		    tuple2 = skipSymbol(file:file,i:&icopy,till:[",","-",":","$","+"])
-			if tuple2.ch != "," || icopy < 0
-			{break}							
-			skipWhite(file:file,i:&icopy)
-			tuple2 = skipSymbol(file:file,i:&icopy,till:[" ",","])					
-		    }
-	      i = icopy	- 1// - 1
-			if tuple2.ch == ":" || tuple2.ch == "-"
-		    {readProperties(file:file,i:&i,c:&c)}	
-	    }
-	   else	
-		  {
-		  readProperties(file:file,i:&i,c:&c)	  
-		  }
-	  }
-	 }
-func readData1(file:String,i:inout Int,tuple: inout(str:String,ch:Character) ,c:inout ProtocolData ) -> Void
-     {
-     skipWhite(file:file,i:&i) 
-		if i < 0 {return}
-	  tuple  = skipSymbol(file:file,i:&i,till:[" "])	
-	  c.name = tuple.str
-	  tuple = skipSymbol(file:file,i:&i,till:["$","+","-",":"])	
-	  i -= 1	
-	  if tuple.ch == "-" 	
-	  {readProperties1(file:file,i:&i,c:&c)}	
-	  else if tuple.ch == ":"
-	  { 
-	    var icopy:Int = i + 1
-		skipWhite(file:file,i:&icopy)  
-		var tuple2 = skipSymbol(file:file,i:&icopy,till:[" ",","])  
-		if !isFunction(str:tuple2.str)
-		{
-			while(true)
-			{   
-			c.inherits.append(tuple2.str)    
-			icopy -= 1
-		    tuple2 = skipSymbol(file:file,i:&icopy,till:[",","-",":","$","+"])
-			if tuple2.ch != "," || icopy < 0
-			{break}							
-			skipWhite(file:file,i:&icopy)
-			tuple2 = skipSymbol(file:file,i:&icopy,till:[" ",","])					
-		    }
-	      i = icopy	- 1// - 1
-			if tuple2.ch == ":" || tuple2.ch == "-"
-		    {readProperties1(file:file,i:&i,c:&c)}	
-	    }
-	   else	
-		  {
-		  readProperties1(file:file,i:&i,c:&c)	  
-		  }
-	  }
-	 }
+
+var (data,data1):([ClassData],[ProtocolData]) = ([],[])
+
 func parse(file:String)->([(ClassData)],[(ProtocolData)])
 {
     var data:[(ClassData)] = []
 	var data1:[ProtocolData] = []
-	//var isClass:Bool
     var i = 0
 	var tuple:(str:String,ch:Character)
 	tuple = skipSymbol(file:file,i:&i,till:["$","+"])
 	i -= 1
 	while(i >= 0)
 	{
-	  //var c:ClassAndExpansion = ClassAndExpansion()
 	 let ch = file[file.index(file.startIndex, offsetBy: i)]	
 	  i += 1
 	  if ch == "$"
 		{
-		//var c:ClassData = ClassData()
-		var c:ClassData = ClassData()	
-		
-		readData(file:file,i:&i,tuple: &tuple,c:&c)
-		//c = (data as ClassData)
+		var c:ClassData = ClassData()			
+		c.readData(file:file,i:&i,tuple: &tuple)
 		data.append(c)
-				   
 		}
       else
 		{
-	    //var c:ProtocolData = ProtocolData()		
 		var c:ProtocolData = ProtocolData()		
-		//isClass = false
-		readData1(file:file,i:&i,tuple: &tuple,c:&c)
+		c.readData(file:file,i:&i,tuple: &tuple)
 		data1.append(c)	
 		}
 	  if i<0 {break}
 	  } 
   return (data,data1)
 }
-//print()
-//var i = 0
-//print(skipSymbol(file:"    go to",i:&i,till:["j"]))+
-//print(i)
 let file:String = 
-" $ Time   - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int    $ Appointment : Time     : getDay() -> Int   - day : Int   : isImpotrant() -> Bool     + Printable  : print() -> Void    "
-var (data,data1) = parse(file:file)
-for cl in data
-{
-	(cl).convert()
-}
+" $ Time : Printable  - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int    $ Appointment : Time     : getDay() -> String   - day : Int   : isImpotrant() -> Bool     + Printable  : print() -> Void - protocolVar : Int   "
+ (data,data1) = parse(file:file)
 for cl in data1
 {
 	cl.convert()
 }
+for cl in data
+{
+	(cl).convert()
+}
+//print(isProtocol(name:"Printable"))
