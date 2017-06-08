@@ -1,4 +1,4 @@
-unc containsAttribute(attribute:Attribute,arr:[Attribute]) -> Bool
+func containsAttribute(attribute:Attribute,arr:[Attribute]) -> Bool
 {
 	for i in arr
 	{
