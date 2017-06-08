@@ -1,4 +1,4 @@
-func containsAttribute(attribute:Attribute,arr:[Attribute]) -> Bool
+unc containsAttribute(attribute:Attribute,arr:[Attribute]) -> Bool
 {
 	for i in arr
 	{
@@ -108,7 +108,6 @@ class ClassAndExpansion
 	{}
 	      init(name:String="", inherits:[String] = [],attributes:[Attribute] = [],funcArr:[Function] = [])
     {
-	 // super.init()	
       self.name = name
       self.inherits = inherits	
       self.funcArr = funcArr
@@ -123,13 +122,14 @@ class ClassAndExpansion
 	var tuple2:(str:String,ch:Character)
 	repeat
        {
-        ch = file[file.index(file.startIndex, offsetBy: i)]
+        ch = file[file.index(file.startIndex, offsetBy: i)] // ch is "-" or ":"  
 	    i += 1
 		skipWhite(file:file,i:&i)                            
-		tuple = skipSymbol(file:file,i:&i,till:[" "])        
+		tuple = skipSymbol(file:file,i:&i,till:[" "])   // get name     
 	    skipSymbol(file:file,i:&i,till:[":",">"])            
 		skipWhite(file:file,i:&i)                            
-		tuple1 = skipSymbol(file:file,i:&i,till:[" "])       ;if i < 0 {break}
+		tuple1 = skipSymbol(file:file,i:&i,till:[" "])  // get type
+		if i < 0 {break}
 	    if ch == "-"
 		{
 		self.attributes.append(Attribute(name:tuple.str,type:tuple1.str))		
@@ -154,7 +154,7 @@ class ClassAndExpansion
 	  i -= 1	
 	  if tuple.ch == "-" 	
 	  {self.readProperties(file:file,i:&i)}	
-	  else if tuple.ch == ":"
+	  else if tuple.ch == ":"     // function or inherited class
 	  { 
 	    var icopy:Int = i + 1
 		skipWhite(file:file,i:&icopy)  
@@ -377,8 +377,8 @@ var (data,data1):([ClassData],[ProtocolData]) = ([],[])
 
 func parse(file:String)->([(ClassData)],[(ProtocolData)])
 {
-    var data:[(ClassData)] = []
-	var data1:[ProtocolData] = []
+    var data:[(ClassData)] = []    // classes
+	var data1:[ProtocolData] = []  // protocols
     var i = 0
 	var tuple:(str:String,ch:Character)
 	tuple = skipSymbol(file:file,i:&i,till:["$","+"])
@@ -404,13 +404,13 @@ func parse(file:String)->([(ClassData)],[(ProtocolData)])
   return (data,data1)
 }
 let file:String = 
-"$ Day $ Time : , Day, Printable    - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int  : print() -> Void  $ Appointment : Time     : getDay() -> String   - day : Int   : isImpotrant() -> Bool     + Printable  : print() -> Void  : print2() -> Void - protocolVar : Int   "
+"$ Day - something : String   : getsomething() -> String $ Time : Day, Printable    - hour : Int  - minutes : Int  - seconds :  Double   : getHour() -> Int  : print() -> Void  $ Appointment : Time     : getDay() -> String   - day : Int   : isImpotrant() -> Bool     + Printable  : print() -> Void  : print2() -> Void - protocolVar : Int   "
  (data,data1) = parse(file:file)
-for cl in data1
+for cl in data1   // print protocols
 {
 	cl.convert()
 }
-for cl in data
+for cl in data   // print classes
 {
 	(cl).convert()
 }
